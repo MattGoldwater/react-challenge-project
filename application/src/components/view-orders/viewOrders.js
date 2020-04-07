@@ -10,13 +10,15 @@ const mapStateToProps = (state) => ({
 })
 
 class ViewOrders extends Component {
-    state = {
-        orders: []
-    }
+        controller = new AbortController();
+        signal = this.controller.signal;
+        state = {
+            orders: []
+        }
 
 
     componentDidMount() {
-        fetch(`${SERVER_IP}/api/current-orders`)
+        fetch(`${SERVER_IP}/api/current-orders`, {signal: this.signal})
             .then(response => response.json())
             .then(response => {
                 if(response.success) {
@@ -24,7 +26,13 @@ class ViewOrders extends Component {
                 } else {
                     console.log('Error getting orders');
                 }
-            });
+            }).catch(() => {
+                console.log('request for current orders cancelled!');
+            })
+    }
+
+    componentWillUnmount() {
+        this.controller.abort();
     }
 
     render() {
