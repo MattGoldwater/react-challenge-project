@@ -20,7 +20,7 @@ class OrderForm extends Component {
     }
 
     menuItemChosen(event) {
-        this.setState({ item: event.target.value });
+        this.setState({ order_item: event.target.value });
     }
 
     menuQuantityChosen(event) {
@@ -47,6 +47,7 @@ class OrderForm extends Component {
     }
 
     render() {
+        console.log('in orderForm this.props.auth is: ', this.props.auth);
         return (
             <Template>
                 <div className="form-wrapper">
