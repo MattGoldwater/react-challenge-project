@@ -1,5 +1,5 @@
-import React from "react";
-import {withRouter, Link } from "react-router-dom";
+import React, {useState} from "react";
+import {Redirect, Link } from "react-router-dom";
 import { connect } from 'react-redux'; 
 import "./nav.css";
 import { logoutUser } from '../../redux/actions/authActions';
@@ -11,9 +11,13 @@ const mapActionsToProps = dispatch => ({
   })
 
 const Nav = (props) => {
+    const [redirect, setRedirect] = useState(false);
     const logout = () => {
         props.commenceLogout();
-        props.history.push('/');
+        setRedirect(true);
+    }
+    if (redirect) {
+        return <Redirect to='/'/>
     }
     return (
         <div className="nav-strip">
@@ -36,4 +40,4 @@ const Nav = (props) => {
     );
 }
 
-export default withRouter(connect(null, mapActionsToProps)(Nav));
+export default connect(null, mapActionsToProps)(Nav);
