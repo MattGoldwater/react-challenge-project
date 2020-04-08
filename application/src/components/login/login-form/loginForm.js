@@ -21,7 +21,6 @@ class LoginForm extends Component {
   login(e) {
     e.preventDefault();
     this.props.commenceLogin(this.state.email, this.state.password);
-    console.log('commenceLogin finishes')
   }
 
   onChange(key, val) {
@@ -30,7 +29,6 @@ class LoginForm extends Component {
 
   render() {
     if (this.props.auth.token === '12345luggage') {
-      console.log('hits this.props.auth.token === 12345luggage')
       return this.props.onLogin();
     } 
     return (
