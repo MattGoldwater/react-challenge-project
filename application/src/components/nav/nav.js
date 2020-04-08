@@ -1,8 +1,24 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, {useState} from "react";
+import {Redirect, Link } from "react-router-dom";
+import { connect } from 'react-redux'; 
 import "./nav.css";
+import { logoutUser } from '../../redux/actions/authActions';
+
+const mapActionsToProps = dispatch => ({
+    commenceLogout() {
+      dispatch(logoutUser())
+    }
+  })
 
 const Nav = (props) => {
+    const [redirect, setRedirect] = useState(false);
+    const logout = () => {
+        props.commenceLogout();
+        setRedirect(true);
+    }
+    if (redirect) {
+        return <Redirect to='/'/>
+    }
     return (
         <div className="nav-strip">
             <Link to={"/order"} className="nav-link">
@@ -15,13 +31,13 @@ const Nav = (props) => {
                     <label className="nav-label">View Orders</label>
                 </div>
             </Link>
-            <Link to={"/login"} className="nav-link">
+            <div onClick={logout} className="nav-link">
                 <div className="nav-link-style">
                     <label className="nav-label">Log Out</label>
                 </div>
-            </Link>
+            </div>
         </div>
     );
 }
 
-export default Nav;
+export default connect(null, mapActionsToProps)(Nav);
