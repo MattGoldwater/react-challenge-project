@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {Redirect} from 'react-router-dom';
 import { Template } from '../../components';
 import { SERVER_IP } from '../../private';
 import './viewOrders.css';
@@ -7,8 +8,10 @@ class ViewOrders extends Component {
     constructor() {
         super()
         this.state = {
-            orders: []
+            orders: [],
+            editInfo: false
         }
+        this.editOrder = this.editOrder.bind(this);
         this.deleteOrder = this.deleteOrder.bind(this)
     }
 
@@ -39,7 +42,14 @@ class ViewOrders extends Component {
         });
     }
 
+    editOrder(quantity, item, id) {
+        this.setState({editInfo: {quantity, item, id}});
+    }
+
     render() {
+        if (this.state.editInfo) {
+            return <Redirect to={{pathname: '/order', state: {edit: true, ...this.state.editInfo}}}/>
+        }
         return (
             <Template>
                 <div className="container-fluid">
@@ -57,7 +67,7 @@ class ViewOrders extends Component {
                                     <p>Quantity: {order.quantity}</p>
                                  </div>
                                  <div className="col-md-4 view-order-right-col">
-                                     <button className="btn btn-success">Edit</button>
+                                     <button onClick={this.editOrder.bind(null, order.quantity, order.order_item, order._id)} className="btn btn-success">Edit</button>
                                      <button onClick={this.deleteOrder.bind(null, order._id)} className="btn btn-danger">Delete</button>
                                  </div>
                             </div>
