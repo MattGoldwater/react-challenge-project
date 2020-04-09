@@ -47,7 +47,6 @@ class OrderForm extends Component {
     }
 
     render() {
-        console.log('in orderForm this.props.auth is: ', this.props.auth);
         return (
             <Template>
                 <div className="form-wrapper">
