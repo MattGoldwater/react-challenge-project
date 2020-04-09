@@ -4,9 +4,15 @@ import { SERVER_IP } from '../../private';
 import './viewOrders.css';
 
 class ViewOrders extends Component {
-    state = {
-        orders: []
+    constructor() {
+        super()
+        this.state = {
+            orders: []
+        }
+        this.deleteOrder = this.deleteOrder.bind(this)
     }
+
+    
 
     componentDidMount() {
         fetch(`${SERVER_IP}/api/current-orders`)
@@ -20,11 +26,25 @@ class ViewOrders extends Component {
             });
     }
 
+    async deleteOrder(id) {
+        await fetch(`${SERVER_IP}/api/delete-order`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+              },
+            body: JSON.stringify({id,})
+        })
+        this.setState((prevState) => {
+            return {orders: prevState.orders.filter((order) => order._id !== id)}
+        });
+    }
+
     render() {
         return (
             <Template>
                 <div className="container-fluid">
                     {this.state.orders.map(order => {
+                        console.log('order is: ', order);
                         const createdDate = new Date(order.createdAt);
                         return (
                             <div className="row view-order-container" key={order._id}>
@@ -38,7 +58,7 @@ class ViewOrders extends Component {
                                  </div>
                                  <div className="col-md-4 view-order-right-col">
                                      <button className="btn btn-success">Edit</button>
-                                     <button className="btn btn-danger">Delete</button>
+                                     <button onClick={this.deleteOrder.bind(null, order._id)} className="btn btn-danger">Delete</button>
                                  </div>
                             </div>
                         );
