@@ -3,8 +3,7 @@ import { Template } from '../../components';
 import { connect } from 'react-redux';
 import { SERVER_IP } from '../../private';
 import './orderForm.css';
-
-const ADD_ORDER_URL = `${SERVER_IP}/api/add-order`
+import { Redirect } from 'react-router-dom';
 
 const mapStateToProps = (state) => ({
     auth: state.auth,
@@ -14,44 +13,56 @@ class OrderForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            order_item: "",
-            quantity: "1"
+            order_item: props.location.state?.item || "",
+            quantity: props.location.state?.quantity || "1",
+            redirect: false
         }
     }
 
     menuItemChosen(event) {
-        this.setState({ item: event.target.value });
+        this.setState({ order_item: event.target.value });
     }
 
     menuQuantityChosen(event) {
         this.setState({ quantity: event.target.value });
     }
 
-    submitOrder(event) {
+    async submitOrder(event) {
         event.preventDefault();
+        const {edit} = this.props.location.state ?? false;
+        const editOrAdd = edit ? 'edit' : 'add';
         if (this.state.order_item === "") return;
-        fetch(ADD_ORDER_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-                order_item: this.state.order_item,
-                quantity: this.state.quantity,
-                ordered_by: this.props.auth.email || 'Unknown!',
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(response => console.log("Success", JSON.stringify(response)))
-        .catch(error => console.error(error));
+        try {
+            const res = await fetch(`${SERVER_IP}/api/${editOrAdd}-order`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    order_item: this.state.order_item,
+                    quantity: this.state.quantity,
+                    ordered_by: this.props.auth.email || 'Unknown!',
+                    id: this.props.location.state?.id
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            const response = await res.json();
+            console.log("Success", JSON.stringify(response));
+            this.setState({redirect: true})
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     render() {
+        if (this.state.redirect) {
+            return <Redirect to='/view-orders'/>
+        }
+        const {edit} = this.props.location.state ?? false;
         return (
             <Template>
                 <div className="form-wrapper">
                     <form>
-                        <label className="form-label">I'd like to order...</label><br />
+                        <label className="form-label">{edit? 'Edit' : 'I\'d like to'} order...</label><br />
                         <select 
                             value={this.state.order_item} 
                             onChange={(event) => this.menuItemChosen(event)}
