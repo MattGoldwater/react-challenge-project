@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'; 
 import { loginUser } from '../../../redux/actions/authActions'
 
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+})
+
 const mapActionsToProps = dispatch => ({
   commenceLogin(email, password) {
     dispatch(loginUser(email, password))
@@ -17,7 +21,6 @@ class LoginForm extends Component {
   login(e) {
     e.preventDefault();
     this.props.commenceLogin(this.state.email, this.state.password);
-    this.props.onLogin();
   }
 
   onChange(key, val) {
@@ -25,6 +28,9 @@ class LoginForm extends Component {
   }
 
   render() {
+    if (this.props.auth.token === '12345luggage') {
+      return this.props.onLogin();
+    } 
     return (
       <form>
         <div className="form-group">
@@ -43,4 +49,4 @@ class LoginForm extends Component {
   }
 }
 
-export default connect(null, mapActionsToProps)(LoginForm);
+export default connect(mapStateToProps, mapActionsToProps)(LoginForm);

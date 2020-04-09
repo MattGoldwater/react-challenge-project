@@ -1,15 +1,24 @@
 import React, { Component } from 'react';
+import {Redirect} from 'react-router-dom';
+import { connect } from 'react-redux';
 import { Template } from '../../components';
 import { SERVER_IP } from '../../private';
 import './viewOrders.css';
 
+const mapStateToProps = (state) => ({
+    auth: state.auth,
+})
+
 class ViewOrders extends Component {
-    state = {
-        orders: []
-    }
+        controller = new AbortController();
+        signal = this.controller.signal;
+        state = {
+            orders: []
+        }
+
 
     componentDidMount() {
-        fetch(`${SERVER_IP}/api/current-orders`)
+        fetch(`${SERVER_IP}/api/current-orders`, {signal: this.signal})
             .then(response => response.json())
             .then(response => {
                 if(response.success) {
@@ -17,10 +26,19 @@ class ViewOrders extends Component {
                 } else {
                     console.log('Error getting orders');
                 }
-            });
+            }).catch(() => {
+                console.log('request for current orders cancelled!');
+            })
+    }
+
+    componentWillUnmount() {
+        this.controller.abort();
     }
 
     render() {
+        if (this.props.auth.token !== '12345luggage') {
+            return <Redirect to="/login"/>
+        }
         return (
             <Template>
                 <div className="container-fluid">
@@ -49,4 +67,4 @@ class ViewOrders extends Component {
     }
 }
 
-export default ViewOrders;
+export default connect(mapStateToProps)(ViewOrders);
