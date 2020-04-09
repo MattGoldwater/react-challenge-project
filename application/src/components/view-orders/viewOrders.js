@@ -19,32 +19,36 @@ class ViewOrders extends Component {
                 }
             });
     }
+    
+    formatOrderTime(orderTime) {
+        const createdDate = new Date(orderTime);
+        const dateFormatter = new Intl.DateTimeFormat('en-US', {
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+        })
+        const formattedDate = dateFormatter.formatToParts(createdDate);
+        const timeElements = {
+            hours: '',
+            minutes: '',
+            seconds: ''
+        }
+        for (const element of formattedDate) {
+            let {type, value}  = element; 
+            type = `${type}s`;
+            if (timeElements.hasOwnProperty(type)) {
+                timeElements[type] = value;
+            } 
+        }
+        return timeElements;
+    }
 
     render() {
         return (
             <Template>
                 <div className="container-fluid">
                     {this.state.orders.map(order => {
-                        const createdDate = new Date(order.createdAt);
-                        const dateFormatter = new Intl.DateTimeFormat('en-US', {
-                            hour: 'numeric',
-                            minute: 'numeric',
-                            second: 'numeric',
-                        })
-                        const formattedDate = dateFormatter.formatToParts(createdDate);
-                        const timeElements = {
-                            hours: '',
-                            minutes: '',
-                            seconds: ''
-                        }
-                        for (const element of formattedDate) {
-                            let {type, value}  = element; 
-                            type = `${type}s`;
-                            if (timeElements.hasOwnProperty(type)) {
-                                timeElements[type] = value;
-                            } 
-                        }
-                        const {hours, minutes, seconds} = timeElements;
+                        const {hours, minutes, seconds} = this.formatOrderTime(order.createdAt);
                         return (
                             <div className="row view-order-container" key={order._id}>
                                 <div className="col-md-4 view-order-left-col p-3">
