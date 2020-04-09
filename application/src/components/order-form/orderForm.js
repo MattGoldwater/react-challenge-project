@@ -27,27 +27,30 @@ class OrderForm extends Component {
         this.setState({ quantity: event.target.value });
     }
 
-    submitOrder(event) {
+    async submitOrder(event) {
         event.preventDefault();
         const {edit} = this.props.location.state ?? false;
         const editOrAdd = edit ? 'edit' : 'add';
         if (this.state.order_item === "") return;
-        fetch(`${SERVER_IP}/api/${editOrAdd}-order`, {
-            method: 'POST',
-            body: JSON.stringify({
-                order_item: this.state.order_item,
-                quantity: this.state.quantity,
-                ordered_by: this.props.auth.email || 'Unknown!',
-                id: this.props.location.state?.id
-            }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(response => console.log("Success", JSON.stringify(response)))
-        .then(() => this.setState({redirect: true}))
-        .catch(error => console.error(error));
+        try {
+            const res = await fetch(`${SERVER_IP}/api/${editOrAdd}-order`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    order_item: this.state.order_item,
+                    quantity: this.state.quantity,
+                    ordered_by: this.props.auth.email || 'Unknown!',
+                    id: this.props.location.state?.id
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            const response = await res.json();
+            console.log("Success", JSON.stringify(response));
+            this.setState({redirect: true})
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     render() {
