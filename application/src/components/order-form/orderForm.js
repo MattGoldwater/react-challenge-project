@@ -3,6 +3,7 @@ import { Template } from '../../components';
 import { connect } from 'react-redux';
 import { SERVER_IP } from '../../private';
 import './orderForm.css';
+import { Redirect } from 'react-router-dom';
 
 const mapStateToProps = (state) => ({
     auth: state.auth,
@@ -13,7 +14,8 @@ class OrderForm extends Component {
         super(props);
         this.state = {
             order_item: props.location.state?.item || "",
-            quantity: props.location.state?.quantity || "1"
+            quantity: props.location.state?.quantity || "1",
+            redirect: false
         }
     }
 
@@ -27,7 +29,7 @@ class OrderForm extends Component {
 
     submitOrder(event) {
         event.preventDefault();
-        const {edit} = this.props.location.state;
+        const {edit} = this.props.location.state ?? false;
         const editOrAdd = edit ? 'edit' : 'add';
         if (this.state.order_item === "") return;
         fetch(`${SERVER_IP}/api/${editOrAdd}-order`, {
@@ -44,11 +46,15 @@ class OrderForm extends Component {
         })
         .then(res => res.json())
         .then(response => console.log("Success", JSON.stringify(response)))
+        .then(() => this.setState({redirect: true}))
         .catch(error => console.error(error));
     }
 
     render() {
-        const {edit} = this.props.location.state;
+        if (this.state.redirect) {
+            return <Redirect to='/view-orders'/>
+        }
+        const {edit} = this.props.location.state ?? false;
         return (
             <Template>
                 <div className="form-wrapper">
