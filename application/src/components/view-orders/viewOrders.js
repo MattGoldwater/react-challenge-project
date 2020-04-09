@@ -67,4 +67,4 @@ class ViewOrders extends Component {
     }
 }
 
-export default connect(mapStateToProps, null)(ViewOrders);
+export default connect(mapStateToProps)(ViewOrders);
