@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 import { SERVER_IP } from '../../private';
 import './orderForm.css';
 
-const ADD_ORDER_URL = `${SERVER_IP}/api/add-order`
-
 const mapStateToProps = (state) => ({
     auth: state.auth,
 })
@@ -14,13 +12,13 @@ class OrderForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            order_item: "",
-            quantity: "1"
+            order_item: props.location.state?.item || "",
+            quantity: props.location.state?.quantity || "1"
         }
     }
 
     menuItemChosen(event) {
-        this.setState({ item: event.target.value });
+        this.setState({ order_item: event.target.value });
     }
 
     menuQuantityChosen(event) {
@@ -29,13 +27,16 @@ class OrderForm extends Component {
 
     submitOrder(event) {
         event.preventDefault();
+        const {edit} = this.props.location.state;
+        const editOrAdd = edit ? 'edit' : 'add';
         if (this.state.order_item === "") return;
-        fetch(ADD_ORDER_URL, {
+        fetch(`${SERVER_IP}/api/${editOrAdd}-order`, {
             method: 'POST',
             body: JSON.stringify({
                 order_item: this.state.order_item,
                 quantity: this.state.quantity,
                 ordered_by: this.props.auth.email || 'Unknown!',
+                id: this.props.location.state?.id
             }),
             headers: {
                 'Content-Type': 'application/json'
@@ -47,11 +48,12 @@ class OrderForm extends Component {
     }
 
     render() {
+        const {edit} = this.props.location.state;
         return (
             <Template>
                 <div className="form-wrapper">
                     <form>
-                        <label className="form-label">I'd like to order...</label><br />
+                        <label className="form-label">{edit? 'Edit' : 'I\'d like to'} order...</label><br />
                         <select 
                             value={this.state.order_item} 
                             onChange={(event) => this.menuItemChosen(event)}
