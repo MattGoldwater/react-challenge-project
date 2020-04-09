@@ -54,7 +54,6 @@ class ViewOrders extends Component {
             <Template>
                 <div className="container-fluid">
                     {this.state.orders.map(order => {
-                        console.log('order is: ', order);
                         const createdDate = new Date(order.createdAt);
                         return (
                             <div className="row view-order-container" key={order._id}>
